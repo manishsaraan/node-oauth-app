@@ -40,7 +40,7 @@ module.exports = {
       clientId: clientId,
       clientSecret: clientSecret,
       grants: ['authorization_code', 'refresh_token'],
-      redirectUris: ['http://localhost:3030/client/app'],
+      redirectUris: ['https://oauth-app-2.herokuapp.com/client/app'],
     };
     return new Promise((resolve) => {
       resolve(db.client);

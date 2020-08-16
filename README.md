@@ -14,13 +14,21 @@
 
 # Installation and Setup
 
-1.  Clone this Repo
+1.  Clone this project in development mode
 
 1.  `cd` into the project root folder, and install packages with `yarn or npm install`
 
-1)  Run `yarn start` to start app.
-
 1)  Run `yarn dev` to boot up the server in dev mode. This will enable hot reloading when your code changes.
+
+1)  Visit `[http://localhost:3030](http://localhost:3030)` to view the ui
+
+## Running in production
+
+1.  `cd` into the project root folder
+
+1.  Build docker image with `docker build -t node-app .`
+
+1.  Create container with `docker run -p 3030:3030 node-app`
 
 1)  Visit `[http://localhost:3030](http://localhost:3030)` to view the ui
 

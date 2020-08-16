@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Logged In Client</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body class="container" onload="onLoad()">
+    <div style="display: flex; align-items: center; justify-content: center;">
+      <h1>Logging in...</h1>
+    </div>
+
+    <script>
+      const secret = 'MYSECRET'; // probs shouldn't be stored locally on the frontend
+      const id = 'myClientId'; // probs shouldn't be stored locally on the frontend
+      (function () {
+        // We are immediately executing this anonymous function. The semi-colon is necessary
+        const urlParams = new URLSearchParams(window.location.search); // retrieve the authorization code from the url
+        code = urlParams.get('code');
+      })();
+      function onLoad() {
+        const urlParams = new URLSearchParams(window.location.search); // retrieve the authorization code from the url
+        const code = urlParams.get('code');
+
+        fetch('/oauth/token', {
+          method: 'POST',
+          body: `code=${code}&client_secret=${secret}&client_id=${id}&grant_type=authorization_code`, // this is how we send that data up
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        })
+          .then((res) => res.json())
+          .then((res) => {
+            const userData = {
+              token: res.access_token,
+              tokenType: res.token_type,
+              refreshToken: res.refresh_token,
+            };
+
+            // DON'T STORE THE TOKEN ON THE CLIENT FRONT END!!! Put it in a session cookie or something to be more secure
+            localStorage.setItem('user', JSON.stringify(userData));
+            window.location.href = '/client/dashboard';
+          });
+      }
+    </script>
+  </body>
+</html>

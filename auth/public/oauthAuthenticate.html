@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>OAuth Authentication App</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body class="container">
+    <h1>Authentication On Our Server</h1>
+    <form action="/oauth/authorize" method="post">
+      <!-- hiding here for simplicity, must be handled securly on production -->
+      <div style="display: none;">
+        <input class="form-control" name="client_id" />
+        <input class="form-control" name="redirect_uri" />
+        <input class="form-control" name="response_type" />
+        <input class="form-control" name="grant_type" />
+        <input class="form-control" name="state" />
+      </div>
+      <p>
+        The defaults for this will successfully login. Anything else will fail
+      </p>
+      <div class="form-group">
+        <label>Username</label>
+        <input
+          class="form-control auth"
+          type="text"
+          name="username"
+          value="username"
+        />
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input
+          class="form-control auth"
+          type="text"
+          name="password"
+          value="password"
+        />
+      </div>
+      <span id="error" style="display: none; color: red;"></span>
+      <input type="submit" class="btn btn-success" />
+    </form>
+    <script>
+      (function () {
+        // getting values from query params and updating the config fields
+        const urlParams = new URLSearchParams(window.location.search);
+
+        [
+          'client_id',
+          'redirect_uri',
+          'response_type',
+          'grant_type',
+          'state',
+        ].forEach((type) => {
+          const input = document.body.querySelector(`input[name=${type}]`);
+          const value = urlParams.get(type);
+          input.value = value;
+        });
+
+        const error = urlParams.get('success') === 'false';
+
+        // if in callback response there is an error, update fields accordingly
+        if (error) {
+          document.body
+            .querySelectorAll('.auth')
+            .forEach((el) => el.classList.add('is-invalid'));
+          const error = document.getElementById('error');
+          const urlParasms = new URLSearchParams(window.location.search);
+          error.textContent = urlParams.get('error');
+          error.style.display = 'block';
+        }
+      })();
+    </script>
+  </body>
+</html>

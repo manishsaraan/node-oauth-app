@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Logged In Client</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body class="container" onload="accessSecretArea()">
+    <h1>Token for logged in user</h1>
+    <p>
+      The client needs to use the provided valid token to get protected
+      resources
+    </p>
+    <p>Token: <span id="token"></span></p>
+    <p>Refresh Token: <span id="refresh_token"></span></p>
+    <h1>Get Refresh Token</h1>
+    <p>
+      This operation must be done with backend as it involves secret. I am doing
+      here for sake of simplicity
+    </p>
+
+    <button onclick="refreshTokenNow()" class="btn btn-primary">
+      Refresh Token
+    </button>
+
+    <script>
+      // secret and token should be stored in backend
+      const secret = 'MYSECRET';
+      const id = 'myClientId';
+      let user = {};
+
+      // verifying if user is logged in with required credentials, if now then redirect to login page
+      function accessSecretArea() {
+        const userData = localStorage.getItem('user');
+
+        if (!userData) {
+          window.location.href = '/';
+        }
+
+        user = JSON.parse(userData);
+        const { token, refreshToken, tokenType } = user;
+        const authorization = `${tokenType} ${token}`;
+        console.log('Bearer token:', authorization);
+        fetch('/secure/', {
+          headers: new Headers({
+            Authorization: authorization,
+          }),
+        })
+          .then((res) => {
+            if (!res.ok) {
+              window.location.href = '/';
+            }
+            return res.json();
+          })
+          .then((res) => {
+            document.getElementById('token').innerText = token;
+            document.getElementById('refresh_token').innerText = refreshToken;
+          })
+          .catch((e) => {
+            console.error('Fail:', e);
+            window.location.href = '/';
+          });
+      }
+
+      // fetching new refresh token and token, this operation must be handled from backend as it involves secret for gettting new tokens from auth server
+      function refreshTokenNow() {
+        const { refreshToken } = user;
+
+        fetch('/oauth/token', {
+          method: 'POST',
+          body: `refresh_token=${refreshToken}&client_secret=${secret}&client_id=${id}&grant_type=refresh_token`,
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        })
+          .then((res) => {
+            if (!res.ok) {
+              window.location.href = '/';
+            }
+
+            return res.json();
+          })
+          .then((res) => {
+            const userData = {
+              token: res.access_token,
+              refreshToken: res.refresh_token,
+              tokenType: res.token_type,
+            };
+
+            localStorage.setItem('user', JSON.stringify(userData));
+            document.getElementById('token').innerText = userData.token;
+            document.getElementById('refresh_token').innerText =
+              userData.refreshToken;
+          })
+          .catch((e) => {
+            window.location.href = '/';
+          });
+      }
+    </script>
+  </body>
+</html>

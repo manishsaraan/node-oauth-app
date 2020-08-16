@@ -4,8 +4,8 @@
   "description": "Example oauth app with secure pages",
   "main": "index.js",
   "scripts": {
-    "start": "node auth/app.js",
-    "dev": "npx nodemon auth/app.js"
+    "start": "node app/index.js",
+    "dev": "npx nodemon app/index.js"
   },
   "author": "manish saraan",
   "license": "ISC",
